@@ -1,0 +1,13 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "pipInstall",
+        "type": "shell",
+        "linux": {
+          "command": "${config:python.pythonPath} -m pip install -r requirements.txt"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }

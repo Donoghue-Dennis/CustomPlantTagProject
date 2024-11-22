@@ -1,0 +1,15 @@
+{
+    "version": "0.1.0",
+    "configurations": [
+    
+        {
+            "name": "PyDeBug Default Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/PlantTagDriver.py",
+            "args": [ "./TestPlants.csv", "./output/DebugTestPlantsOut.csv"],
+            "console": "integratedTerminal",
+            "preLaunchTask": "pipInstall",
+        },
+    ]
+}
