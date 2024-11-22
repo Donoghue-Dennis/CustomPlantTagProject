@@ -16,4 +16,4 @@ def processPlantCSV(iInputFilePath,iOutputFilePath):
         for row in plantReader:
             lPlantInfoList.append(PlantInfo.PlantInfo(row))
     # write to output csv
-    PrintingUtilities.printPlantInfoListToCSV(iOutputFilePath,lPlantInfoList)
+    PrintingUtilities.printPlantInfoListToConsole(lPlantInfoList)

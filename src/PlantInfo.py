@@ -4,8 +4,8 @@ import itertools
 class PlantInfo:
     def __init__(self,iRow=None,iScientificName=None,iCommonNameList=None,iStampingOptions=None):
         if iRow is not None:
-            self.ScientificName = iRow[0]
-            self.CommonNameList = iRow[1:]
+            self.ScientificName = iRow[0].strip()
+            self.CommonNameList = [str.strip() for str in iRow[1:]]
             self.StampingOptions = []
             self.__GenerateStampingOptions()
         elif iScientificName is not None and iCommonNameList is not None:
@@ -26,9 +26,9 @@ class PlantInfo:
         if ((self.ScientificName is not None) and
             (self.CommonNameList is not None) and
             (0 < len(self.CommonNameList))):
-            self.StampingOptions.append(PlantTag.PlantTag(self.ScientificName))
+            self.StampingOptions.append(PlantTag.PlantTag(self.ScientificName.upper()))
             for jCommonName in self.CommonNameList:
-                self.StampingOptions.append(PlantTag.PlantTag(jCommonName))
+                self.StampingOptions.append(PlantTag.PlantTag(jCommonName.upper()))
         
             # sort Stamping options by complexity score
             self.StampingOptions.sort(key=lambda x:x.ComplexityScore, reverse=False)

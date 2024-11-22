@@ -8,13 +8,13 @@ ROW_COUNT = 3
 COLUMN_COUNT = 17
 
 class PlantTag:
-    def __init__(self, iPlantName=None, iStampingPlan=None, iComplexityScore=None, iStampingOrder=None, i__PlantNameRowList=None):
+    def __init__(self, iPlantName=None, iStampingPlan=None, iComplexityScore=None, iStampingOrder=None, iPlantNameRowList=None):
         if iPlantName is not None:
             self.PlantName = iPlantName
             self.StampingPlan = None
             self.ComplexityScore = None
             self.StampingOrder = None
-            self.__PlantNameRowList = []
+            self.PlantNameRowList = []
             self.__LetterCounterList = []
             self.__GenerateStampingPlan()
             self.__GetComplexityScore()
@@ -24,26 +24,27 @@ class PlantTag:
             self.StampingPlan = None
             self.ComplexityScore = None
             self.StampingOrder = None
-            self.__PlantNameRowList = None
+            self.PlantNameRowList = None
 
 
     def __GenerateStampingPlan(self):
         if self.PlantName is not None:
             if 0 < len(self.PlantName):
-                # initialize Plant Tag construction values
+                # initialize Plant Tag construction values to 2d array of whitespace chars
                 self.StampingPlan = np.empty(shape=[ROW_COUNT,COLUMN_COUNT],dtype=np.dtypes.StringDType)
-                
+                self.StampingPlan.fill(" ")
+
                 # split string into rows, cut and merge to size
                 lRawPlantNameRowList = self.PlantName.split()
-                self.__PlantNameRowList = self.__RightSizeStringsForRowLength(lRawPlantNameRowList)
+                self.PlantNameRowList = self.__RightSizeStringsForRowLength(lRawPlantNameRowList)
 
-                if ROW_COUNT < len(self.__PlantNameRowList):
+                if ROW_COUNT < len(self.PlantNameRowList):
                     logger.error("Unable to Generate Stamping Plan, Plant name is too way long")
                     raise Exception("Unable to Generate Stamping Plan, Plant name is too way long")
 
                 # slot strings into rows
-                for index in range(len(self.__PlantNameRowList)):
-                    self.__CenterStringInRow(self.__PlantNameRowList[index], index)
+                for index in range(len(self.PlantNameRowList)):
+                    self.__CenterStringInRow(self.PlantNameRowList[index], index)
             else:
                 logger.error("Unable to Generate Stamping Plan, Plant name is empty")
                 raise Exception("Unable to Generate Stamping Plan, Plant name is empty")
@@ -57,10 +58,10 @@ class PlantTag:
         oStampingOrder = ""
         
         # build list of LetterCounter objects
-        for x in range(len(self.__PlantNameRowList)):
-            lRowSortedCharList = sorted(self.__PlantNameRowList[x])
+        for x in range(len(self.PlantNameRowList)):
+            lRowSortedCharList = sorted(self.PlantNameRowList[x])
             for y in range (len(lRowSortedCharList)):
-                matchingLetterList = filter(lambda z: z.Letter == lRowSortedCharList[y], lLetterList)
+                matchingLetterList = list(filter(lambda z: z.Letter == lRowSortedCharList[y], lLetterList))
                 if 0 < len(matchingLetterList):
                     matchingLetterList[0].LetterCount+=1
                     matchingLetterList[0].RowSet.add(x)
@@ -69,7 +70,7 @@ class PlantTag:
 
         # sort list of LetterCounter objects by LetterCount then RowSet Length
         # and save sorted list
-        self.__LetterCounterList = sorted(lLetterList, key=lambda l: (l.LetterCount, len(l.RowSet)))
+        self.__LetterCounterList = sorted(lLetterList, key=lambda l: (l.LetterCount, -len(l.RowSet)),reverse=True)
 
         # convert sorted list to string
         for jLetterCounter in self.__LetterCounterList:
@@ -92,6 +93,7 @@ class PlantTag:
 
     def __RightSizeStringsForRowLength(self, iStringList):
         for j in range(len(iStringList)):
+            logger.debug("Rightsizing " + iStringList[j])
             if(len(iStringList[j]) > COLUMN_COUNT):
                 # truncate long word
                 logger.debug("Truncated " + iStringList[j] + " to " + iStringList[j][:COLUMN_COUNT])
@@ -104,24 +106,32 @@ class PlantTag:
                     iStringList.pop(j+1)
                     # call recursively, with merged string
                     return self.__RightSizeStringsForRowLength(iStringList)
+            logger.debug("Rightsized " + iStringList[j])
         return iStringList
 
     def __CenterStringInRow(self, iString, iRowIndex):
+        logger.debug("Centering " + iString + " in Row " + str(iRowIndex))
         # init reused values
         mCol = COLUMN_COUNT//2
         mStr = len(iString)//2
 
         # handle middle slot
-        lIsEven = len(iString) % 2
-        if(lIsEven):
-            # middle slot is whitespace char
-            self.StampingPlan[iRowIndex][mCol] = " "
-        else:
+        lIsOdd = len(iString) % 2
+        if(lIsOdd):
             # fill middle slot with middle char, remove middle char
             self.StampingPlan[iRowIndex][mCol] = iString[mStr]
             iString = iString[:mStr] + iString[mStr+1:]
 
         # handle other slots
-        for k in range(len(iString)//2):
-            self.StampingPlan[iRowIndex][mCol + k] = iString[mStr + k]
-            self.StampingPlan[iRowIndex][mCol - k] = iString[mStr - k]
+        debugStr = ""
+        for k in range((len(iString)//2)):
+            lowColIndex = mCol - k - 1
+            highColIndex = mCol + k + 1
+            lowStrIndex = mStr - k - 1
+            highStrIndex = mStr + k
+            lowChar = iString[lowStrIndex]
+            highChar = iString[highStrIndex]
+            self.StampingPlan[iRowIndex][lowColIndex] = lowChar
+            self.StampingPlan[iRowIndex][highColIndex] = highChar
+            debugStr = lowChar + debugStr + highChar
+        logger.debug("Inserted string " + debugStr)

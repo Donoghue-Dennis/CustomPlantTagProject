@@ -3,3 +3,4 @@ src/__pycache__/PlantInfo.cpython-310.pyc
 src/__pycache__/PlantTag.cpython-310.pyc
 src/__pycache__/PrintingUtilities.cpython-310.pyc
 src/__pycache__/ProcessingUtilities.cpython-310.pyc
+*.log
