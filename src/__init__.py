@@ -1,5 +1,6 @@
-__all__ = ["PlantInfo", "PlantTag", "PrintingUtilities", "ProcessingUtilities"]
+__all__ = ["LetterCounter", "PlantInfo", "PlantTag", "PrintingUtilities", "ProcessingUtilities"]
 
+from . import LetterCounter
 from . import PlantInfo
 from . import PlantTag
 from . import PrintingUtilities
