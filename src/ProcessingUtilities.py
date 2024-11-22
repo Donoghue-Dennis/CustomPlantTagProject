@@ -1,4 +1,5 @@
-from src import *
+from src import PrintingUtilities
+from src import PlantInfo
 import csv
 
 def processPlantCSV(iInputFilePath,iOutputFilePath):
@@ -13,6 +14,6 @@ def processPlantCSV(iInputFilePath,iOutputFilePath):
 
         # construct plant list from other rows
         for row in plantReader:
-            lPlantInfoList.append(PlantInfo(row))
+            lPlantInfoList.append(PlantInfo.PlantInfo(row))
     # write to output csv
     PrintingUtilities.printPlantInfoListToCSV(iOutputFilePath,lPlantInfoList)
